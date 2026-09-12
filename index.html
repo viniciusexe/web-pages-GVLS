@@ -155,6 +155,34 @@
     .cover-hint svg{ animation: none !important; }
   }
 
+  /* ---------------- audio toggle ---------------- */
+  .audio-toggle{
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 40;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: var(--canvas);
+    color: var(--blue-deep);
+    box-shadow: 0 6px 16px rgba(51,64,78,.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .4s ease, transform .15s ease;
+  }
+  .audio-toggle.show{ opacity: 1; pointer-events: auto; }
+  .audio-toggle:active{ transform: scale(.92); }
+  .audio-toggle svg{ width: 20px; height: 20px; }
+  .audio-toggle .icon-off{ display: none; }
+  .audio-toggle.muted .icon-on{ display: none; }
+  .audio-toggle.muted .icon-off{ display: block; }
+
   /* ---------------- invite card ---------------- */
   .invite{ position: relative; width: 100%; max-width: 460px; margin: 0 auto; }
 
@@ -387,6 +415,12 @@
   </div>
 </div>
 
+<audio id="bgm" src="musica.convite.mp3" loop preload="none"></audio>
+<button type="button" class="audio-toggle" id="audioToggle" aria-label="Ativar ou desativar a música" aria-pressed="true">
+  <svg class="icon-on" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16.2 8.3a5.5 5.5 0 0 1 0 7.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M18.8 5.7a9.5 9.5 0 0 1 0 12.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  <svg class="icon-off" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M15.8 9.2l5.6 5.6M21.4 9.2l-5.6 5.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+</button>
+
 <div class="invite">
   <div class="frame">
     <div class="card">
@@ -506,6 +540,8 @@
   var trigger = document.getElementById('envelopeBtn');
   var cover = document.getElementById('cover');
   var invite = document.querySelector('.invite');
+  var bgm = document.getElementById('bgm');
+  var audioToggle = document.getElementById('audioToggle');
   var opened = false;
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function openInvite(){
@@ -519,8 +555,17 @@
       invite.classList.add('revealed');
     }, flapDelay);
     window.setTimeout(function(){ cover.hidden = true; }, hideDelay);
+    if(bgm){
+      bgm.play().catch(function(){});
+      audioToggle.classList.add('show');
+    }
   }
   trigger.addEventListener('click', openInvite);
+  audioToggle.addEventListener('click', function(){
+    bgm.muted = !bgm.muted;
+    audioToggle.classList.toggle('muted', bgm.muted);
+    audioToggle.setAttribute('aria-pressed', bgm.muted ? 'false' : 'true');
+  });
 })();
 </script>
 
